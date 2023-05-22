@@ -24,7 +24,7 @@ func ValidateGetTodosRequest(sortByReq string) error {
 }
 
 func ValidateTodoRequest(todo models.TodoDetail) error {
-	if !HasStringValue(todo.ID.String()) && !HasStringValue(todo.Title) && !HasStringValue(todo.CreatedAt.String()) && !HasStringValue(todo.Status) {
+	if !HasStringValue(todo.ID.String()) || !HasStringValue(todo.Title) || !HasStringValue(todo.CreatedAt.String()) || !HasStringValue(todo.Status) {
 		return errors.New("id, title, date, status must be required")
 	}
 	if _, err := uuid.Parse(todo.ID.String()); err != nil {
@@ -36,7 +36,7 @@ func ValidateTodoRequest(todo models.TodoDetail) error {
 	if _, err := time.Parse(time.RFC3339, todo.CreatedAt.Format(time.RFC3339)); err != nil {
 		return errors.New("date must be RFC3339 with timezone")
 	}
-	if todo.Status != "IN_PROGRESS" && todo.Status != "COMPLETE" {
+	if (todo.Status != "IN_PROGRESS" && todo.Status != "COMPLETE") {
 		return errors.New("status must be IN_PROGRESS or COMPLETE")
 	}
 	if todo.Image != nil {

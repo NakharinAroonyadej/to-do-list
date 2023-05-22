@@ -17,7 +17,6 @@ import (
 
 func TestGetTodo(t *testing.T) {
 	mockTodoRepo := new(mocks.TodoRepository)
-	mockTodoUsecase := new(mocks.TodoUsecase)
 	mockTodoList := models.TodoList{
 		TodoList: []models.TodoDetail{
 			{
@@ -40,8 +39,7 @@ func TestGetTodo(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.Equal(t, mockTodoList, got)
-
-		mockTodoUsecase.AssertExpectations(t)
+		mockTodoRepo.AssertExpectations(t)
 	})
 
 	t.Run("failed-error", func(t *testing.T) {
@@ -53,14 +51,12 @@ func TestGetTodo(t *testing.T) {
 
 		assert.Error(t, err)
 		assert.Equal(t, models.TodoList{}, got)
-
-		mockTodoUsecase.AssertExpectations(t)
+		mockTodoRepo.AssertExpectations(t)
 	})
 }
 
 func TestSearchTodo(t *testing.T) {
 	mockTodoRepo := new(mocks.TodoRepository)
-	mockTodoUsecase := new(mocks.TodoUsecase)
 	mockSearchByTitle := models.TodoDetail{
 		ID:          uuid.New(),
 		Title:       "Search By Title",
@@ -101,8 +97,8 @@ func TestSearchTodo(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.Equal(t, mockTodoList, got)
+		mockTodoRepo.AssertExpectations(t)
 
-		mockTodoUsecase.AssertExpectations(t)
 	})
 
 	t.Run("search by title", func(t *testing.T) {
@@ -116,8 +112,8 @@ func TestSearchTodo(t *testing.T) {
 		assert.Equal(t, models.TodoList{
 			TodoList: []models.TodoDetail{mockSearchByTitle},
 		}, got)
+		mockTodoRepo.AssertExpectations(t)
 
-		mockTodoUsecase.AssertExpectations(t)
 	})
 
 	t.Run("search by description", func(t *testing.T) {
@@ -131,7 +127,7 @@ func TestSearchTodo(t *testing.T) {
 		assert.Equal(t, models.TodoList{
 			TodoList: []models.TodoDetail{mockSearchByDesc},
 		}, got)
-		mockTodoUsecase.AssertExpectations(t)
+		mockTodoRepo.AssertExpectations(t)
 	})
 
 	t.Run("failed-error", func(t *testing.T) {
@@ -143,13 +139,12 @@ func TestSearchTodo(t *testing.T) {
 
 		assert.Error(t, err)
 		assert.Equal(t, models.TodoList{}, got)
+		mockTodoRepo.AssertExpectations(t)
 
-		mockTodoUsecase.AssertExpectations(t)
 	})
 }
 
 func TestCreateTodo(t *testing.T) {
-	mockTodoUsecase := new(mocks.TodoUsecase)
 	var fakeTodo models.TodoDetail
 	gofakeit.Struct(fakeTodo)
 	mockTodoList := models.TodoList{
@@ -168,8 +163,7 @@ func TestCreateTodo(t *testing.T) {
 		err := usecase.CreateTodo(fakeTodo)
 
 		assert.NoError(t, err)
-
-		mockTodoUsecase.AssertExpectations(t)
+		mockTodoRepo.AssertExpectations(t)
 	})
 
 	t.Run("same id", func(t *testing.T) {
@@ -182,8 +176,7 @@ func TestCreateTodo(t *testing.T) {
 		err := usecase.CreateTodo(fakeTodo)
 
 		assert.Error(t, err)
-
-		mockTodoUsecase.AssertExpectations(t)
+		mockTodoRepo.AssertExpectations(t)
 	})
 
 	t.Run("repo write error", func(t *testing.T) {
@@ -196,8 +189,7 @@ func TestCreateTodo(t *testing.T) {
 		err := usecase.CreateTodo(fakeTodo)
 
 		assert.Error(t, err)
-
-		mockTodoUsecase.AssertExpectations(t)
+		mockTodoRepo.AssertExpectations(t)
 	})
 
 	t.Run("repo read error", func(t *testing.T) {
@@ -209,15 +201,14 @@ func TestCreateTodo(t *testing.T) {
 		err := usecase.CreateTodo(fakeTodo)
 
 		assert.Error(t, err)
+		mockTodoRepo.AssertExpectations(t)
 
-		mockTodoUsecase.AssertExpectations(t)
 	})
 
 }
 
 func TestUpdateTodo(t *testing.T) {
 	mockTodoRepo := new(mocks.TodoRepository)
-	mockTodoUsecase := new(mocks.TodoUsecase)
 	var fakeTodo models.TodoDetail
 	gofakeit.Struct(fakeTodo)
 	mockTodoList := models.TodoList{
@@ -225,7 +216,6 @@ func TestUpdateTodo(t *testing.T) {
 			fakeTodo,
 		},
 	}
-
 
 	t.Run("success", func(t *testing.T) {
 		mockUpdate := models.TodoDetail{
@@ -244,13 +234,13 @@ func TestUpdateTodo(t *testing.T) {
 		err := usecase.UpdateTodo(mockUpdate)
 
 		assert.NoError(t, err)
+		mockTodoRepo.AssertExpectations(t)
 
-		mockTodoUsecase.AssertExpectations(t)
 	})
 
 	t.Run("id not found", func(t *testing.T) {
 		mockUpdate := models.TodoDetail{
-			ID:          uuid.New(),
+			ID: uuid.New(),
 		}
 
 		mockTodoRepo.On("GetTodoList", mock.AnythingOfType("string")).Return(mockTodoList, nil).Once()
@@ -261,13 +251,13 @@ func TestUpdateTodo(t *testing.T) {
 		err := usecase.UpdateTodo(mockUpdate)
 
 		assert.Error(t, err)
+		mockTodoRepo.AssertExpectations(t)
 
-		mockTodoUsecase.AssertExpectations(t)
 	})
 
 	t.Run("repo read error", func(t *testing.T) {
 		mockUpdate := models.TodoDetail{
-			ID:          uuid.New(),
+			ID: uuid.New(),
 		}
 
 		mockTodoRepo.On("GetTodoList", mock.AnythingOfType("string")).Return(models.TodoList{}, errors.New("read repo error")).Once()
@@ -277,13 +267,13 @@ func TestUpdateTodo(t *testing.T) {
 		err := usecase.UpdateTodo(mockUpdate)
 
 		assert.Error(t, err)
+		mockTodoRepo.AssertExpectations(t)
 
-		mockTodoUsecase.AssertExpectations(t)
 	})
 
 	t.Run("repo write error", func(t *testing.T) {
 		mockUpdate := models.TodoDetail{
-			ID:          uuid.New(),
+			ID: uuid.New(),
 		}
 		mockTodoRepo.On("GetTodoList", mock.AnythingOfType("string")).Return(models.TodoList{}, nil).Once()
 		mockTodoRepo.On("WriteTodoList", mock.Anything).Return(errors.New("Write error")).Once()
@@ -293,7 +283,7 @@ func TestUpdateTodo(t *testing.T) {
 		err := usecase.UpdateTodo(mockUpdate)
 
 		assert.Error(t, err)
+		mockTodoRepo.AssertExpectations(t)
 
-		mockTodoUsecase.AssertExpectations(t)
 	})
 }
