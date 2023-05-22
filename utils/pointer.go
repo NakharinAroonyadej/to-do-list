@@ -6,3 +6,7 @@ func GetStringValue(p *string) string {
 	}
 	return *p
 }
+
+func NewString(s string) *string {
+	return &s
+}

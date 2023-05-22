@@ -2,7 +2,6 @@ package todo
 
 import (
 	"errors"
-	"log"
 	"strings"
 	"todolist/pkg/domains"
 	"todolist/pkg/models"
@@ -15,7 +14,7 @@ type TodoUsecase struct {
 
 func NewTodoUsecase(r domains.TodoRepository) domains.TodoUsecase {
 	return &TodoUsecase{
-		repo:  r,
+		repo: r,
 	}
 }
 
@@ -50,7 +49,8 @@ func (u *TodoUsecase) SearchTodo(title string, desc string) (todoList models.Tod
 		for _, todo := range todoList.TodoList {
 			lowerTitle := strings.ToLower(todo.Title)
 			lowerDesc := strings.ToLower(utils.GetStringValue(todo.Description))
-			if strings.Contains(lowerTitle, title) || (lowerDesc != "" && strings.Contains(lowerDesc, desc)) {
+			if (lowerTitle != "" && title != "" && strings.Contains(lowerTitle, title)) ||
+				(lowerDesc != "" && desc != "" && strings.Contains(lowerDesc, desc)) {
 				SearchTodoList.TodoList = append(SearchTodoList.TodoList, todo)
 			}
 		}
@@ -71,7 +71,6 @@ func (u *TodoUsecase) CreateTodo(todoReq models.TodoDetail) error {
 		}
 	}
 
-	log.Println("todoReq : ", todoReq)
 	todoList.TodoList = append(todoList.TodoList, todoReq)
 	if err := u.repo.WriteTodoList(todoList); err != nil {
 		return err

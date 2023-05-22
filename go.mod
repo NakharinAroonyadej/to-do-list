@@ -3,6 +3,7 @@ module todolist
 go 1.19
 
 require (
+	github.com/brianvoe/gofakeit/v6 v6.21.0 // indirect
 	github.com/bytedance/sonic v1.8.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
